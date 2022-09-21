@@ -1,0 +1,40 @@
+{
+    "general_settings": {
+        "name": "core_config",
+        "camera_source": 0,
+        "image_size": 640,
+        "headless": false,
+        "test_loop_count": 2000
+    },
+    "ml_lib_settings": {
+        "name": "Yolo6",
+        "weights": "./../../data/model/yolov6s.pt",
+        "yaml": "./../../data/coco.yaml",
+        "conf_thres": 0.4,
+        "iou_thres": 0.45,
+        "max_det": 1000,
+        "device": "0",
+        "hide_labels": false,
+        "hide_conf": false
+    },
+    "lidar": {
+        "port": "/dev/ttyUSB0"
+    },
+    "mqtt_setting": {
+        "mqtt_sub_client": "P1",
+        "mqtt_pub_client": "P2",
+        "broker_address": "10.42.0.1"
+    },
+    "pipeline": {
+        "local_paths": {
+            "log_directory": "../../logs/",
+            "storage_location": "../../logs/dm_alert_frames_th4/"
+        },
+        "logging": {
+            "level": "info",
+            "log_to_console": true,
+            "log_to_file": false,
+            "log_file_name": "dms_logs.log"
+        }
+    }
+}
