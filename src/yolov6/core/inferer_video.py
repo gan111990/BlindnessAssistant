@@ -18,13 +18,16 @@ from yolov6.utils.events import LOGGER, load_yaml
 from yolov6.utils.nms import non_max_suppression
 from yolov6.layers.common import DetectBackend
 from yolov6.data.data_augment import letterbox
-
 class Inferer:
     def __init__(self, weights, device, yaml, img_size):
 
         # self.__dict__.update(locals())
 
         # Init model
+        weights = os.path.abspath(os.path.join(os.path.dirname(__file__), weights))
+        yaml = os.path.abspath(os.path.join(os.path.dirname(__file__), yaml))
+        LOGGER.critical(f'Weights path: {weights}')
+        LOGGER.critical(f'yaml path: {yaml}')
         self.device = device
         self.img_size = img_size
         cuda = self.device != 'cpu' and torch.cuda.is_available()

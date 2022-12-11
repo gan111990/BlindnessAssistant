@@ -44,3 +44,18 @@ class WebcamVideoStream:
     def stop(self):
         # indicate that the thread should be stopped
         self.stopped = True
+
+
+if __name__ == "__main__":
+    from VideoShow import VideoShow
+    videoStream = WebcamVideoStream()
+    videoStream.start()
+    videoShow = VideoShow(videoStream.read()).start()
+    try:
+        while True:
+            frame = videoStream.read()
+            if frame is not None:
+                videoShow.frame = frame
+    except KeyboardInterrupt:
+        videoShow.stop()
+        videoStream.stop()

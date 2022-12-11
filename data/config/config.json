@@ -8,8 +8,8 @@
     },
     "ml_lib_settings": {
         "name": "Yolo6",
-        "weights": "./../../data/model/yolov6s.pt",
-        "yaml": "./../../data/coco.yaml",
+        "weights": "./../../../data/model/yolov6s.pt",
+        "yaml": "./../../../data/coco.yaml",
         "conf_thres": 0.4,
         "iou_thres": 0.45,
         "max_det": 1000,

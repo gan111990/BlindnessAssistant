@@ -17,7 +17,7 @@ sys.path.insert(0, SRC_PATH)
 from main.configuration import Configuration
 from yolov6.utils.events import LOGGER
 from yolov6.core.inferer_video import Inferer
-from lidar.LidarStream import LidarStream
+#from lidar.LidarStream import LidarStream
 from video.VideoShow import VideoShow
 from video.WebcamVideoStream import WebcamVideoStream
 
@@ -49,6 +49,9 @@ def run(config_file_name):
     # enable video show thread only if headless functionality is disabled
     if headless_flag == False:
         video_shower = VideoShow(video_getter.read()).start()
+    # Initialize Lidar
+    # lidar = LidarStream()
+    # lidar.start()
 
     # Inference
     inferer = Inferer(
@@ -74,6 +77,7 @@ def run(config_file_name):
                 config.ml_lib_settings['hide_labels'],
                 config.ml_lib_settings['hide_conf']
             )
+            # scans = lidar.update()
             t2 = time.time()
             # FPS counter
             fps_calculator.update(1.0 / (t2 - t1))
@@ -96,6 +100,7 @@ def run(config_file_name):
         video_getter.stop()
         if headless_flag == False:
             video_shower.stop()
+        # lidar.stop()
         sys.exit()
 
     # Normal stopping
