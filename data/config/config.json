@@ -3,7 +3,7 @@
         "name": "core_config",
         "camera_source": 0,
         "image_size": 640,
-        "headless": false,
+        "headless": true,
         "test_loop_count": 2000
     },
     "ml_lib_settings": {

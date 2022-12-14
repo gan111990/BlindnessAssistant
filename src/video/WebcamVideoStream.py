@@ -5,8 +5,7 @@ import sys
 
 class WebcamVideoStream:
     def __init__(self, src=0, width=640, height=480):
-        # initialize the video camera stream and read the first frame
-        # from the stream
+        # initialize the video camera stream and read the first frame from the stream
         if type(src) == int:
             self.stream = cv2.VideoCapture(src)
             self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, width)
@@ -15,8 +14,7 @@ class WebcamVideoStream:
             self.stream = cv2.VideoCapture(src)
 
         (self.grabbed, self.frame) = self.stream.read()
-        # initialize the variable used to indicate if the thread should
-        # be stopped
+        # initialize the variable used to indicate if the thread should be stopped
         self.stopped = False
 
     def start(self):

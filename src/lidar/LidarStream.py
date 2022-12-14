@@ -9,8 +9,10 @@ SRC_PATH = osp.join('..', '..', 'src')
 sys.path.insert(0, SRC_PATH)
 from util.timer import timeit
 
+
 class LidarStream:
     def __init__(self, port_name='/dev/ttyUSB0'):
+        self.port_name = port_name
         # initialize the lidar for the stream
         self.lidar = RPLidar(port_name)
         self.lidar.connect()
@@ -28,9 +30,11 @@ class LidarStream:
     def update(self):
         # keep looping infinitely until the thread is stopped
         temp_scans = OrderedDict()
-        for scan in self.lidar.iter_measures():
+        for i, scan in enumerate(self.lidar.iter_measures(max_buf_meas=5000)):
+            # print(scan)
             # if the thread indicator variable is set, stop the thread
             if self.stopped:
+                self.lidar.stop_motor()
                 self.lidar.stop()
                 self.lidar.disconnect()
                 return
@@ -62,7 +66,7 @@ if __name__ == "__main__":
     try:
         while True:
             scans = lidarStream.read()
-            pprint.pprint(scans, sort_dicts=False)
+            print(pprint.pformat(scans))
     except KeyboardInterrupt:
         lidarStream.stop()
     print('Finish while loop')

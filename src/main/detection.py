@@ -10,6 +10,7 @@ import numpy as np
 from collections import deque
 import torch
 import cv2
+import pprint
 
 SRC_PATH = osp.join('..', '..', 'src')
 sys.path.insert(0, SRC_PATH)
@@ -17,7 +18,7 @@ sys.path.insert(0, SRC_PATH)
 from main.configuration import Configuration
 from yolov6.utils.events import LOGGER
 from yolov6.core.inferer_video import Inferer
-#from lidar.LidarStream import LidarStream
+from lidar.LidarStream import LidarStream
 from video.VideoShow import VideoShow
 from video.WebcamVideoStream import WebcamVideoStream
 
@@ -50,8 +51,8 @@ def run(config_file_name):
     if headless_flag == False:
         video_shower = VideoShow(video_getter.read()).start()
     # Initialize Lidar
-    # lidar = LidarStream()
-    # lidar.start()
+    lidar = LidarStream()
+    lidar.start()
 
     # Inference
     inferer = Inferer(
@@ -69,7 +70,7 @@ def run(config_file_name):
             else:
                 img_src = latest_frame
             t1 = time.time()
-            img_src = inferer.infer(
+            img_src, detection = inferer.infer(
                 img_src,
                 config.ml_lib_settings['conf_thres'],
                 config.ml_lib_settings['iou_thres'],
@@ -77,7 +78,9 @@ def run(config_file_name):
                 config.ml_lib_settings['hide_labels'],
                 config.ml_lib_settings['hide_conf']
             )
-            # scans = lidar.update()
+            print(detection)
+            scans = lidar.read()
+            print(pprint.pformat(scans))
             t2 = time.time()
             # FPS counter
             fps_calculator.update(1.0 / (t2 - t1))
@@ -100,7 +103,7 @@ def run(config_file_name):
         video_getter.stop()
         if headless_flag == False:
             video_shower.stop()
-        # lidar.stop()
+        lidar.stop()
         sys.exit()
 
     # Normal stopping
@@ -108,6 +111,7 @@ def run(config_file_name):
     video_getter.stop()
     if headless_flag == False:
         video_shower.stop()
+
 
 class CalcFPS:
     def __init__(self, nsamples: int = 50):
