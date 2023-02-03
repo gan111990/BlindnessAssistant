@@ -1,15 +1,27 @@
 {
     "general_settings": {
         "name": "core_config",
-        "camera_source": 0,
-        "image_size": 640,
+        "camera_source": 2,
+        "width": 640,
+        "height": 480,
         "headless": false,
-        "test_loop_count": 2000
+        "test_loop_count": 2000,
+        "camera_intrinsic_matrix": [
+            [345.63337563, 0.0, 376.41497359],
+            [0.0, 343.10318315, 218.70053554],
+            [0.0, 0.0, 1.0]
+        ],
+        "collision_threshold": 1.5,
+        "warning_threshold": 0.2,
+        "critical_distance": 0.5,
+        "sender_email": "ravi11dec1990@gmail.com",
+        "sender_email_pwd": "",
+        "user_email": "ravi11dec1990@gmail.com"
     },
     "ml_lib_settings": {
         "name": "Yolo6",
-        "weights": "./../../data/model/yolov6s.pt",
-        "yaml": "./../../data/coco.yaml",
+        "weights": "./../../../data/model/yolov6s.pt",
+        "yaml": "./../../../data/coco.yaml",
         "conf_thres": 0.4,
         "iou_thres": 0.45,
         "max_det": 1000,

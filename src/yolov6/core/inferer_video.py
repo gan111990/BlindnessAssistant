@@ -18,13 +18,16 @@ from yolov6.utils.events import LOGGER, load_yaml
 from yolov6.utils.nms import non_max_suppression
 from yolov6.layers.common import DetectBackend
 from yolov6.data.data_augment import letterbox
-
 class Inferer:
     def __init__(self, weights, device, yaml, img_size):
 
         # self.__dict__.update(locals())
 
         # Init model
+        weights = os.path.abspath(os.path.join(os.path.dirname(__file__), weights))
+        yaml = os.path.abspath(os.path.join(os.path.dirname(__file__), yaml))
+        LOGGER.critical(f'Weights path: {weights}')
+        LOGGER.critical(f'yaml path: {yaml}')
         self.device = device
         self.img_size = img_size
         cuda = self.device != 'cpu' and torch.cuda.is_available()
@@ -65,19 +68,26 @@ class Inferer:
         img_ori = img_src.copy()
 
         # check image and font
-        assert img_ori.data.contiguous, 'Image needs to be contiguous. Please apply to input images with np.ascontiguousarray(im).'
+        assert img_ori.data.contiguous, 'Image needs to be contiguous. Please apply to input images with ' \
+                                        'np.ascontiguousarray(im).'
         self.font_check()
 
+        detection = []
         if len(det):
             det[:, :4] = self.rescale(img.shape[2:], det[:, :4], img_src.shape).round()
             for *xyxy, conf, cls in reversed(det):
                 class_num = int(cls)  # integer class
                 label = None if hide_labels else (self.class_names[class_num] if hide_conf else f'{self.class_names[class_num]} {conf:.2f}')
-
-                self.plot_box_and_label(img_ori, max(round(sum(img_ori.shape) / 2 * 0.003), 2), xyxy, label, color=self.generate_colors(class_num, True))
+                # LOGGER.critical(f'Class:{label} and '
+                #                 f'co-ordinates:{(int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))}')
+                self.plot_box_and_label(img_ori, max(round(sum(img_ori.shape) / 2 * 0.003), 2), xyxy, label,
+                                        color=self.generate_colors(class_num, True))
+                detection.append({'label': self.class_names[class_num],
+                                  'box': [int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])]})
+                # box: x1, y1, x2 and y2
 
             img_src = np.asarray(img_ori)
-        return img_src
+        return img_src, detection
 
 
     @staticmethod
@@ -130,6 +140,7 @@ class Inferer:
     def draw_text(
         img,
         text,
+        objects_center,
         font=cv2.FONT_HERSHEY_SIMPLEX,
         pos=(0, 0),
         font_scale=1,
@@ -155,6 +166,8 @@ class Inferer:
             font_thickness,
             cv2.LINE_AA,
         )
+        for x, y in objects_center:
+            cv2.circle(img, (x, y), radius=1, color=(0, 0, 255), thickness=-1)
 
         return text_size
 

@@ -1,5 +1,5 @@
 from threading import Thread
-from rplidar import RPLidar
+from pyrplidar import PyRPlidar
 from math import sin, cos, radians, floor
 from collections import OrderedDict
 import copy
@@ -18,6 +18,7 @@ class LidarStream:
     def __init__(self, port_name='/dev/ttyUSB0'):
         self.port_name = port_name
         self.lidar = None
+        self.generator = None
         # Initialize the object distance and x, y co-ordinates
         self.scans = OrderedDict()
         # initialize the variable used to indicate if the thread should be stopped
@@ -25,8 +26,10 @@ class LidarStream:
 
     def start(self):
         # initialize the lidar for the stream
-        self.lidar = RPLidar(self.port_name)
-        self.lidar.connect()
+        self.lidar = PyRPlidar()
+        self.lidar.connect(port=self.port_name)
+        self.lidar.set_motor_pwm(500)
+        self.generator = self.lidar.start_scan()
         # start the thread to read frames from the video stream
         Thread(target=self.update, args=()).start()
         return self
@@ -35,28 +38,24 @@ class LidarStream:
     def update(self):
         # keep looping infinitely until the thread is stopped
         temp_scans = OrderedDict()
-        for i, scan in enumerate(self.lidar.iter_measures(max_buf_meas=5000)):
-            # print(scan)
+        for i, scan in enumerate(self.generator()):
             # if the thread indicator variable is set, stop the thread
             if self.stopped:
-                self.lidar.stop_motor()
                 self.lidar.stop()
+                self.lidar.set_motor_pwm(0)
                 self.lidar.disconnect()
                 self.lidar = None
                 return
             # otherwise, scan
-            angle = floor(scan[2])
+            angle = floor(scan.angle)
             if angle == 359:
                 self.scans = copy.deepcopy(temp_scans)
                 temp_scans = OrderedDict()
 
-            distance = round(scan[3] / 1000, 2)
+            distance = round(scan.distance / 1000, 2)
             # Calculate the x and y coordinates of the point
-            x = distance * np.cos(np.deg2rad(scan[2]))
-            y = distance * np.sin(np.deg2rad(scan[2]))
-            # x = round(distance * cos(radians(scan[2])))
-            # y = round(distance * sin(radians(scan[2])))
-            # temp_scans[angle] = {'x': x, 'y': y, 'distance': distance, 'accuracy': scan[1]}
+            x = distance * np.cos(np.deg2rad(scan.angle))
+            y = distance * np.sin(np.deg2rad(scan.angle))
             temp_scans[angle] = (x, y, distance)
 
     def read(self):

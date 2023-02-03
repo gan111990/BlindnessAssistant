@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords" content="HTML, CSS, JavaScript">
+    <link rel="stylesheet" href="web/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <!-- j Query -->
+    <script type="text/javascript" src="web/js/jquery.2.2.3.min.js"></script>
+</head>
+
+<body>
+    <div class="header-main">
+        <div class="header-top">
+            <div class="header">
+                <div class="logo">
+                    <img src="web/images/logo-white.png" alt="App_logo" width="150px" height="150px">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="total-page">
+        <div> <span class="info-message"> Ready to help you with your daily routine! </span> </div>
+        <div class="bottom-body">
+                <div class="level-menu">
+                    <div class="level-menu-info">
+                        <div class="levels-menu-2">
+                            <span class="CAV-Score-3" id="map-header">App Control:</span>
+                        </div>
+                        <div class="level-menu-indicator">
+                            <div class="levels-menu-3">
+                                Off
+                                <label class="switch">
+                                    <input type="checkbox" name="app-control" onchange="controlCoreApp(this)">
+                                    <span class="slider round"></span>
+                                </label>
+                                On
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="map-div" id="map-div">
+                    <audio controls autoplay src="/warning" onended="reload()" id="warn">
+                        <source type="audio/x-wav;codec=pcm">
+                    </audio>
+                </div>
+            </div>
+    </div>
+   
+     
+   
+    <footer class="footer">
+        <div class="logo">
+            <img src="web/images/logo-white.png" alt="App_logo">
+        </div>
+    </footer>
+    <!-- Js File_________________________________ -->
+    <!-- Bootstrap JS -->
+    <script type="text/javascript" src="web/js/main.js"></script>
+    
+    <script>
+
+    </script>
+</body>
+
+</html>

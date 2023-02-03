@@ -17,13 +17,14 @@ class VideoShow:
 
     def show(self):
         while not self.stopped:
-            try:
-                self.frame = self.frame.download()
-            except:
-                self.frame
-            cv2.imshow("Video", self.frame)
-            if cv2.waitKey(1) == ord("q"):
-                self.stopped = True
+            if self.frame is not None:
+                cv2.imshow("Video", self.frame)
+                if cv2.waitKey(1) == ord("q"):
+                    self.stopped = True
+            else:
+                print("Error: the frame is None.")
+                self.stop()
 
     def stop(self):
         self.stopped = True
+        cv2.destroyAllWindows()
