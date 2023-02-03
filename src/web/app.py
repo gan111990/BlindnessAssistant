@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, send_file
-import pyaudio
 import os
 import sys
 import cv2
