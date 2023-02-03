@@ -70,7 +70,7 @@ class Inferer:
         # check image and font
         assert img_ori.data.contiguous, 'Image needs to be contiguous. Please apply to input images with ' \
                                         'np.ascontiguousarray(im).'
-        self.font_check()
+        # self.font_check()
 
         detection = []
         if len(det):
