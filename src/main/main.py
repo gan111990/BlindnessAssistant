@@ -38,6 +38,7 @@ class Main:
                                               ).start()
         # Initialize Lidar
         self.lidar = LidarStream().start()
+        self.stopped = False
         Thread(target=self.update, args=()).start()
         return self
 

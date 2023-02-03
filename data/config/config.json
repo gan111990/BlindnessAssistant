@@ -1,7 +1,7 @@
 {
     "general_settings": {
         "name": "core_config",
-        "camera_source": 2,
+        "camera_source": 0,
         "width": 640,
         "height": 480,
         "headless": false,
@@ -11,9 +11,9 @@
             [0.0, 343.10318315, 218.70053554],
             [0.0, 0.0, 1.0]
         ],
-        "collision_threshold": 1.5,
+        "collision_threshold": 2.5,
         "warning_threshold": 0.2,
-        "critical_distance": 0.5,
+        "critical_distance": 1,
         "sender_email": "ravi11dec1990@gmail.com",
         "sender_email_pwd": "",
         "user_email": "ravi11dec1990@gmail.com"
