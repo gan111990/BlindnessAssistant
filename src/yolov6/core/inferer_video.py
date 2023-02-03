@@ -140,6 +140,7 @@ class Inferer:
     def draw_text(
         img,
         text,
+        objects_center,
         font=cv2.FONT_HERSHEY_SIMPLEX,
         pos=(0, 0),
         font_scale=1,
@@ -165,6 +166,8 @@ class Inferer:
             font_thickness,
             cv2.LINE_AA,
         )
+        for x, y in objects_center:
+            cv2.circle(img, (x, y), radius=1, color=(0, 0, 255), thickness=-1)
 
         return text_size
 

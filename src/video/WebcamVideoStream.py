@@ -30,10 +30,12 @@ class WebcamVideoStream:
                 if self.stream is not None:
                     # cv2.destroyAllWindows()
                     self.stream.release()
-                    sys.exit()
                 return
             # otherwise, read the next frame from the stream
             (self.grabbed, self.frame) = self.stream.read()
+            if not self.grabbed:
+                print("Error: the camera has been disconnected.")
+                self.stop()
 
     def read(self):
         # return the frame most recently read
@@ -46,8 +48,7 @@ class WebcamVideoStream:
 
 if __name__ == "__main__":
     from VideoShow import VideoShow
-    videoStream = WebcamVideoStream()
-    videoStream.start()
+    videoStream = WebcamVideoStream(src=2).start()
     videoShow = VideoShow(videoStream.read()).start()
     try:
         while True:
@@ -55,5 +56,8 @@ if __name__ == "__main__":
             if frame is not None:
                 videoShow.frame = frame
     except KeyboardInterrupt:
+        videoShow.stop()
+        videoStream.stop()
+    except InterruptedError:
         videoShow.stop()
         videoStream.stop()

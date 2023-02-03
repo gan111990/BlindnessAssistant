@@ -25,7 +25,8 @@ def process_data(data):
             x = distance * cos(radians)
             y = distance * sin(radians)
             point = (360 + int(x / max_distance * 119), 120 + int(y / max_distance * 119))
-            lcd.set_at(point, pygame.Color(255, 255, 255))
+            if 45 > angle < 135:  # because camera maximum angle is 78 degree
+                lcd.set_at(point, pygame.Color(255, 255, 255))
     pygame.display.update()
 
 PORT_NAME = '/dev/ttyUSB0'

@@ -1,27 +1,30 @@
-#!/usr/bin/env python3
-# -*- coding:utf-8 -*-
-import argparse
 import os
 import sys
-import os.path as osp
 
 import time
 import numpy as np
 from collections import deque
 import torch
 import cv2
-import pprint
+import logging
 
-SRC_PATH = osp.join('..', '..', 'src')
-sys.path.insert(0, SRC_PATH)
+find_src = lambda p: os.path.sep.join(p[:p.index('src') + 1])
+SRC_PATH = find_src(os.path.realpath(__file__).split(os.path.sep))
+if SRC_PATH in sys.path:
+    pass
+else:
+    sys.path.insert(0, SRC_PATH)
 
 from main.configuration import Configuration
 from yolov6.utils.events import LOGGER
 from yolov6.core.inferer_video import Inferer
-from lidar.LidarStream import LidarStream
+# from lidar.LidarStream import LidarStream
+from lidar.LidarStreamPylidar import LidarStream
 from video.VideoShow import VideoShow
 from video.WebcamVideoStream import WebcamVideoStream
+from util.util import project_lidar_to_camera, get_closest_objects
 
+K = None
 
 def interrupt_signal_handler(self, signum, stack):
     self.is_interrupted = True
@@ -39,13 +42,21 @@ def run(config_file_name):
     #     os.makedirs(save_dir)
     # else:
     #     LOGGER.warning('Save directory already existed')
-
+    K = np.array(config.general_settings['camera_intrinsic_matrix'])
     cv2.useOptimized()
+    # Inference
+    inferer = Inferer(
+        config.ml_lib_settings['weights'],
+        config.ml_lib_settings['device'],
+        config.ml_lib_settings['yaml'],
+        config.general_settings['width']
+    )
     is_interrupted = False
     headless_flag = config.general_settings['headless']
     video_getter = WebcamVideoStream(src=config.general_settings['camera_source'],
-                                     width=config.general_settings['image_size'],
-                                     height=config.general_settings['image_size']).start()
+                                     # width=config.general_settings['image_size'],
+                                     # height=config.general_settings['image_size']
+                                     ).start()
 
     # enable video show thread only if headless functionality is disabled
     if headless_flag == False:
@@ -53,14 +64,6 @@ def run(config_file_name):
     # Initialize Lidar
     lidar = LidarStream()
     lidar.start()
-
-    # Inference
-    inferer = Inferer(
-        config.ml_lib_settings['weights'],
-        config.ml_lib_settings['device'],
-        config.ml_lib_settings['yaml'],
-        config.general_settings['image_size']
-    )
     fps_calculator = CalcFPS()
     try:
         while True:
@@ -78,39 +81,37 @@ def run(config_file_name):
                 config.ml_lib_settings['hide_labels'],
                 config.ml_lib_settings['hide_conf']
             )
-            print(detection)
             scans = lidar.read()
-            print(pprint.pformat(scans))
+            # print(pprint.pformat(scans))
+            # detection = object_to_lidar_angle_mapping(detection, scans)
+            detection = project_lidar_to_camera(img_src, detection, scans, K)
+            print(detection)
+            get_closest_objects(detection, img_src, K)
             t2 = time.time()
             # FPS counter
             fps_calculator.update(1.0 / (t2 - t1))
             avg_fps = fps_calculator.accumulate()
-            inferer.draw_text(
-                img_src,
-                f"FPS: {avg_fps:0.1f}",
-                pos=(20, 20),
-                font_scale=1.0,
-                text_color=(204, 85, 17),
-                text_color_bg=(255, 255, 255),
-                font_thickness=2,
-            )
             if headless_flag == False:
                 video_shower.frame = img_src
             LOGGER.critical(f"FPS: {avg_fps:0.1f}")
-    except Exception as e:
-        LOGGER.critical(f'Exception occurred in video DMS:{e}')
-        cv2.destroyAllWindows()
-        video_getter.stop()
-        if headless_flag == False:
-            video_shower.stop()
-        lidar.stop()
+    except KeyboardInterrupt:
+        close_service(video_shower, video_getter, lidar, headless_flag)
+        sys.exit()
+    except InterruptedError:
+        close_service(video_shower, video_getter, lidar, headless_flag)
         sys.exit()
 
     # Normal stopping
+    close_service(video_shower, video_getter, lidar, headless_flag)
+    sys.exit()
+
+
+def close_service(video_shower, video_getter, lidar, headless_flag):
     cv2.destroyAllWindows()
-    video_getter.stop()
     if headless_flag == False:
         video_shower.stop()
+    video_getter.stop()
+    lidar.stop()
 
 
 class CalcFPS:
